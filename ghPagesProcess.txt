@@ -1,0 +1,3 @@
+follow this to work on master, then just pull updates to gh-pages branch to push to website
+
+http://lea.verou.me/2011/10/easily-keep-gh-pages-in-sync-with-master/
