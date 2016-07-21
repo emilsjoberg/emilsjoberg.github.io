@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="../../roark/d3/d3.v2.js"></script>
+        <script type="text/javascript" src="../../roark/underscore/underscore.js"></script>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+var svg = d3.select("body").append("svg")
+.attr({
+  width:1100,
+  height:600
+})
+    
+//var totaldata = [{'count': 728, 'name': 'sample0'}, {'count': 824, 'name': 'sample1'}, {'count': 963, 'name': 'sample2'}, {'count': 927, 'name': 'sample3'}, {'count': 721, 'name': 'sample4'}, {'count': 874, 'name': 'sample5'}, {'count': 733, 'name': 'sample6'}, {'count': 757, 'name': 'sample7'}, {'count': 879, 'name': 'sample8'}, {'count': 620, 'name': 'sample9'}];    
+
+var preReactionData = [
+  {'reaction': 'lol', 'tweets': 3},
+  {'reaction': 'omg', 'tweets': 34},
+  {'reaction': 'wtf', 'tweets': 7}
+  ]
+    
+var postReactionData = [
+  {'reaction': 'lol', 'tweets': 2},
+  {'reaction': 'omg', 'tweets': 20},
+  {'reaction': 'wtf', 'tweets': 2}
+  ]
+
+var totalReactionData = [
+  {'reaction': 'lol', 'tweets': 5},
+  {'reaction': 'omg', 'tweets': 64},
+  {'reaction': 'wtf', 'tweets': 10}
+  ]
+  
+var preEmoticonData = [
+  {'emoticon': ':)', 'tweets': 8},
+  {'emoticon': ':(', 'tweets': 10},
+  {'emoticon': ':/', 'tweets': 20},
+  {'emoticon': '<3', 'tweets': 10}
+  ]
+    
+var postEmoticonData = [
+  {'emoticon': ':)', 'tweets': 6},
+  {'emoticon': ':(', 'tweets': 15},
+  {'emoticon': ':/', 'tweets': 15},
+  {'emoticon': '<3', 'tweets': 20}
+  ]
+    
+var totalEmoticonData = [
+  {'emoticon': ':)', 'tweets': 14},
+  {'emoticon': ':(', 'tweets': 25},
+  {'emoticon': ':/', 'tweets': 35},
+  {'emoticon': '<3', 'tweets': 30}
+  ]
+
+var preSwearingData = [
+  {'swear': 'yes', 'tweets': 1000},
+  {'swear': 'no', 'tweets': 10000}
+  ]    
+    
+var postSwearingData = [
+  {'swear': 'yes', 'tweets': 2000},
+  {'swear': 'no', 'tweets': 5000}
+  ]
+    
+var totalSwearingData = [
+  {'swear': 'yes', 'tweets': 3000},
+  {'swear': 'no', 'tweets': 15000}
+  ]
+
+var prePolarizingData = [
+  {'polarize': 'positive', 'tweets': 150},
+  {'polarize': 'negative', 'tweets': 250}
+  ]    
+
+var postPolarizingData = [
+  {'polarize': 'positive', 'tweets': 100},
+  {'polarize': 'negative', 'tweets': 150}
+  ]    
+    
+var totalPolarizingData = [
+  {'polarize': 'positive', 'tweets': 250},
+  {'polarize': 'negative', 'tweets': 400}
+  ]
+
+var preConversationData = [
+  {'conversation': 'reply', 'tweets': 150},
+  {'conversation': 'RT', 'tweets': 20}
+  ]    
+
+var postConversationData = [
+  {'conversation': 'reply', 'tweets': 50},
+  {'conversation': 'RT', 'tweets': 80}
+  ]    
+    
+var totalConversationData = [
+  {'conversation': 'reply', 'tweets': 200},
+  {'conversation': 'RT', 'tweets': 100}
+  ]
+   
+var preCertaintyData = [
+  {'certainty': '!', 'tweets': 15},
+  {'certainty': '?', 'tweets': 20}
+  ]    
+   
+var postCertaintyData = [
+  {'certainty': '!', 'tweets': 25},
+  {'certainty': '?', 'tweets': 10}
+  ]    
+    
+var totalCertaintyData = [
+  {'certainty': '!', 'tweets': 40},
+  {'certainty': '?', 'tweets': 30}
+  ]
+  
+
+var cx = 20;
+var cy = 20;
+var cw = 1007;
+var ch = 563;
+
+var x = d3.scale.linear()
+    .domain([0, 64])
+    .range([0, 300]);
+
+var widthReactionScale = d3.scale.linear()
+    .domain([0, d3.max(totalReactionData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+
+var widthEmoticonScale = d3.scale.linear()
+    .domain([0, d3.max(totalEmoticonData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+
+var widthSwearingScale = d3.scale.linear()
+    .domain([0, d3.max(totalSwearingData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+
+var widthPolarizingScale = d3.scale.linear()
+    .domain([0, d3.max(totalPolarizingData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+
+var widthConversationScale = d3.scale.linear()
+    .domain([0, d3.max(totalConversationData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+var widthCertaintyScale = d3.scale.linear()
+    .domain([0, d3.max(totalCertaintyData, function(d) { return d.tweets; })])
+  .range([0, 300]);
+
+var chart = svg.append("g")
+    .attr("transform", "translate(" + [cx,cy] + ")");
+
+chart.append("rect")
+  .attr({
+    id: "bg",
+    width: cw,
+    height: ch,
+    fill: "lightgrey"
+  })
+  
+chart.append("g")
+  .attr("id", "points")
+
+//VIZ 1
+var hbarsReaction = chart.select("#points").selectAll("rect.reactionBars")
+    .data(totalReactionData)
+hbarsReaction.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    width: function(d, i) {
+        return widthReactionScale(d.tweets)
+      },
+    height: 20,
+    x: function(d, i) {
+        return 57
+      },
+    y: function(d, i) { 
+        return (i * 22) + 57; 
+      },
+    })
+      .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 6)
+              .attr("y", i * 21 + 70)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.reaction)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 60)
+              .attr("y", i * 21 + 70)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+    
+//Reaction Axis
+var xAxisReaction = d3.svg.axis()
+    .scale(widthReactionScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [57, 159] + ")")
+  .call(xAxisReaction)
+chart.append("text")
+  .text("Reactions")
+  .attr({
+    x: 57,
+    y: 41,
+  })
+
+
+//VIZ 2
+var hbarsEmoticon = chart.select("#points").selectAll("rect.Emoticonbars")
+    .data(totalEmoticonData)
+hbarsEmoticon.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    height: 20,
+    width: function(d, i) {
+        return widthEmoticonScale(d.tweets)
+      },
+    y: function(d, i) {
+        return (i * 22) + 36;  
+      },
+    x: function(d, i) {
+        return 500
+      },
+    })
+        .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 445)
+              .attr("y", i * 21 + 51)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.emoticon)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 505)
+              .attr("y", i * 21 + 51)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+//Emoticon Axis
+var xAxisEmoticon = d3.svg.axis()
+    .scale(widthEmoticonScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [500, 159] + ")")
+  .call(xAxisEmoticon)
+chart.append("text")
+  .text("Emoticons")
+  .attr({
+    x: 500,
+    y: 25,
+  })
+  
+  //VIZ 3
+var hbarsSwearing = chart.select("#points").selectAll("rect.Swearingbars")
+    .data(totalSwearingData)
+hbarsSwearing.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    height: 20,
+    width: function(d, i) {
+        return widthSwearingScale(d.tweets)
+      },
+    y: function(d, i) {
+        return (i * 22) + 257; 
+      },
+    x: function(d, i) {
+        return 57
+      },
+    })
+        .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 0)
+              .attr("y", i * 21 + 270)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.swear)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 60)
+              .attr("y", i * 21 + 270)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+//Swearing Axis
+var xAxisSwearing = d3.svg.axis()
+    .scale(widthSwearingScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [57, 335] + ")")
+  .call(xAxisSwearing)
+chart.append("text")
+  .text("Swearing")
+  .attr({
+    x: 57,
+    y: 240,
+  })
+  
+  //VIZ 4
+var hbarsPolarizing = chart.select("#points").selectAll("rect.Polarizingbars")
+    .data(totalPolarizingData)
+hbarsPolarizing.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    height: 20,
+    width: function(d, i) {
+        return widthPolarizingScale(d.tweets)
+      },
+    y: function(d, i) {
+        return (i * 22) + 257; 
+      },
+    x: function(d, i) {
+        return 500
+      },
+    })
+        .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 440)
+              .attr("y", i * 21 + 270)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.polarize)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 505)
+              .attr("y", i * 21 + 270)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+//Polarizing Axis
+var xAxisPolarizing = d3.svg.axis()
+    .scale(widthPolarizingScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [500, 335] + ")")
+  .call(xAxisPolarizing)
+chart.append("text")
+  .text("Polarizing Comments")
+  .attr({
+    x: 500,
+    y: 240,
+  })
+  
+  //VIZ 5
+var hbarsConversation = chart.select("#points").selectAll("rect.Conversationbars")
+    .data(totalConversationData)
+hbarsConversation.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    height: 20,
+    width: function(d, i) {
+        return widthConversationScale(d.tweets)
+      },
+    y: function(d, i) {
+        return (i * 22) + 457; 
+      },
+    x: function(d, i) {
+        return 57
+      },
+    })
+        .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 1)
+              .attr("y", i * 21 + 470)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.conversation)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 60)
+              .attr("y", i * 21 + 470)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+//Swearing Axis
+var xAxisConversation = d3.svg.axis()
+    .scale(widthConversationScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [57, 535] + ")")
+  .call(xAxisConversation)
+chart.append("text")
+  .text("Conversation")
+  .attr({
+    x: 57,
+    y: 440,
+  })
+  
+  //VIZ 6
+var hbarsCertainty = chart.select("#points").selectAll("rect.Certainty")
+    .data(totalCertaintyData)
+hbarsCertainty.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    height: 20,
+    width: function(d, i) {
+        return widthCertaintyScale(d.tweets)
+      },
+    y: function(d, i) {
+        return (i * 22) + 457; 
+      },
+    x: function(d, i) {
+        return 500
+      },
+    })
+        .style("fill", "steelblue")
+      .on('mouseover', function(d,i) {
+         d3.select(this).style('fill','grey');  
+            hoverTextName 
+              .text(d.tweets + " tweets")
+              .attr("fill", "black")
+              .attr("text-anchor", "start")
+              .attr("x", 445)
+              .attr("y", i * 21 + 470)
+              .style("font-size", 11);
+      hoverTextTweets
+              .text(d.certainty)
+              .attr("fill", "white")
+              .attr("text-anchor", "start")
+              .attr("x", 505)
+              .attr("y", i * 21 + 470)
+              .style("font-size", 11);
+            })
+      .on('mouseout', function(d, i) {
+              hoverTextName
+                .text("");
+              hoverTextTweets
+                .text("");
+        d3.select(this).style('fill', 'steelblue');
+        });
+//Certainty Axis
+var xAxisCertainty = d3.svg.axis()
+    .scale(widthCertaintyScale)
+    .orient("top")
+    .ticks(5)
+chart.append("g")
+  .attr("class", "axis")
+  .style("stroke", "black")
+  .style("fill", "none")
+  .style("font-size", 11)
+  .attr("transform", "translate(" + [500, 535] + ")")
+  .call(xAxisCertainty)
+chart.append("text")
+  .text("Reactions")
+  .attr({
+    x: 500,
+    y: 440,
+  })
+  
+var hoverTextName = chart.append("text");
+var hoverTextTweets = chart.append("text");
+
+//button attributes
+var button_attr = {
+    width: 100,
+    height: 20,
+    fill: "none",
+    stroke: "black"
+}
+var buttontext_attr = {
+    "alignment-baseline": "hanging",
+    "text-anchor": "middle",
+    x: 50,
+    y: 2.5
+}
+
+//buttons
+    
+//pre launch button
+var prelaunch = svg.append("g")
+  .attr({
+      transform: "translate(" + [cw - 90, ch - 525] + ")",
+      "pointer-events":"all"
+   })
+prelaunch.append("rect")
+  .attr(button_attr)
+prelaunch.append("text")
+  .text("pre launch")
+  .attr(buttontext_attr)
+  prelaunch.on("click", function() {
+    
+    //Viz 1
+    hbarsReaction
+      .data(preReactionData)
+      .attr({
+      width: function(d, i) {
+        return widthReactionScale(d.tweets)
+      },
+      height: 20,
+      x: function(d, i) {
+        return 57
+      },
+      y: function(d, i) {
+        return (i * 22) + 57; 
+      }, 
+      })
+      
+      //Viz 2
+    hbarsEmoticon
+        .data(preEmoticonData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthEmoticonScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 36; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })
+      
+     //Viz 3  
+     hbarsSwearing
+        .data(preSwearingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthSwearingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        }) 
+           
+    //Viz 4
+   hbarsPolarizing
+        .data(prePolarizingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthPolarizingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })    
+           
+    //Viz 5
+   hbarsConversation
+        .data(preConversationData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthConversationScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        })       
+           
+    ///Viz 6
+   hbarsCertainty
+        .data(preCertaintyData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthCertaintyScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })  
+            
+   //end        
+  })
+    
+//post launch button
+   var postlaunch = svg.append("g")
+  .attr({
+      transform: "translate(" + [cw - 90, ch - 495] + ")",
+      "pointer-events":"all"
+   })
+postlaunch.append("rect")
+  .attr(button_attr)
+postlaunch.append("text")
+  .text("post launch")
+  .attr(buttontext_attr)
+  postlaunch.on("click", function() {
+    
+        //Viz 1
+    hbarsReaction
+      .data(postReactionData)
+      .attr({
+      width: function(d, i) {
+        return widthReactionScale(d.tweets)
+      },
+      height: 20,
+      x: function(d, i) {
+        return 57
+      },
+      y: function(d, i) {
+        return (i * 22) + 57; 
+      }, 
+      })
+      
+      //Viz 2
+    hbarsEmoticon
+        .data(postEmoticonData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthEmoticonScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 36; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })
+      
+   //Viz 3  
+     hbarsSwearing
+        .data(postSwearingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthSwearingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        })     
+         
+    //Viz 4
+   hbarsPolarizing
+        .data(postPolarizingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthPolarizingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })
+     
+  //Viz 5
+   hbarsConversation
+        .data(postConversationData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthConversationScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        })   
+     
+ ///Viz 6
+   hbarsCertainty
+        .data(postCertaintyData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthCertaintyScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })  
+     
+    //end   
+  })
+    
+//total button
+    var totallaunch = svg.append("g")
+  .attr({
+      transform: "translate(" + [cw - 90, ch - 465] + ")",
+      "pointer-events":"all"
+   })
+totallaunch.append("rect")
+  .attr(button_attr)
+totallaunch.append("text")
+  .text("total")
+  .attr(buttontext_attr)
+  totallaunch.on("click", function() {
+    
+        //Viz 1
+        hbarsReaction
+      .data(totalReactionData)
+      .attr({
+      width: function(d, i) {
+        return widthReactionScale(d.tweets)
+      },
+      height: 20,
+      x: function(d, i) {
+        return 57
+      },
+      y: function(d, i) {
+        return (i * 22) + 57; 
+      }, 
+      })
+    
+    //Viz2
+    hbarsEmoticon
+        .data(totalEmoticonData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthEmoticonScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 36; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })
+             
+   //Viz 3  
+     hbarsSwearing
+        .data(totalSwearingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthSwearingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        })
+       
+  //Viz 4
+   hbarsPolarizing
+        .data(totalPolarizingData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthPolarizingScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 257; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })
+     
+  //Viz 5
+   hbarsConversation
+        .data(totalConversationData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthConversationScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 57
+          },
+        })
+     
+   ///Viz 6
+   hbarsCertainty
+        .data(totalCertaintyData)
+        .attr({
+        height: 20,
+        width: function(d, i) {
+            return widthCertaintyScale(d.tweets)
+          },
+        y: function(d, i) {
+            return (i * 22) + 457; 
+          },
+        x: function(d, i) {
+            return 500
+          },
+        })  
+       
+  //end       
+  })
+
+
+        </script>
+    </body>
+</html> 

@@ -1,0 +1,47 @@
+metric,bank,score
+Impression,"""Bank of America""",-31.12
+Impression,"""Chase""",-4.38
+Impression,"""PNC Bank""",0.46
+Impression,"""US Bank""",-2.32
+Impression,"""Wells Fargo""",-3.88
+Value,"""Bank of America""",-26.98
+Value,"""Chase""",-6.95
+Value,"""PNC Bank""",-2.69
+Value,"""US Bank""",-3.97
+Value,"""Wells Fargo""",-7.19
+Recommend,"""Bank of America""",-28.16
+Recommend,"""Chase""",-3.68
+Recommend,"""PNC Bank""",-0.20
+Recommend,"""US Bank""",-1.72
+Recommend,"""Wells Fargo""",-3.92
+Awareness,"""Bank of America""",94.36
+Awareness,"""Chase""",91.56
+Awareness,"""PNC Bank""",45.17
+Awareness,"""US Bank""",53.12
+Awareness,"""Wells Fargo""",92.91
+Ad Awareness,"""Bank of America""",29.16
+Ad Awareness,"""Chase""",27.37
+Ad Awareness,"""PNC Bank""",5.79
+Ad Awareness,"""US Bank""",4.50
+Ad Awareness,"""Wells Fargo""",24.17
+WOM Exposure,"""Bank of America""",14.00
+WOM Exposure,"""Chase""",10.53
+WOM Exposure,"""PNC Bank""",3.19
+WOM Exposure,"""US Bank""",2.85
+WOM Exposure,"""Wells Fargo""",12.71
+Consideration,"""Bank of America""",8.36
+Consideration,"""Chase""",12.74
+Consideration,"""PNC Bank""",5.05
+Consideration,"""US Bank""",4.56
+Consideration,"""Wells Fargo""",12.13
+Purchase Intent,"""Bank of America""",4.41
+Purchase Intent,"""Chase""",6.96
+Purchase Intent,"""PNC Bank""",2.64
+Purchase Intent,"""US Bank""",2.37
+Purchase Intent,"""Wells Fargo""",6.79
+Current Customer,"""Bank of America""",19.15
+Current Customer,"""Chase""",19.65
+Current Customer,"""PNC Bank""",4.48
+Current Customer,"""US Bank""",4.98
+Current Customer,"""Wells Fargo""",16.53
+

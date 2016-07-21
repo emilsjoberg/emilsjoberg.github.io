@@ -1,0 +1,82 @@
+
+<html>
+  <head>
+  <script type="text/javascript" src="d3.v2.js"></script>
+  <script type="text/javascript" src="data.json"></script>
+  <style>
+
+  </style>
+  </head>
+  <body>
+  <script type="text/javascript">
+
+  var heightScale = d3.scale.linear()
+    .domain([0, d3.max(de, function(d) { return d.count; })])
+    .range([0, 300]);
+
+  var t = d3.select("body")
+    .append("svg")
+      .attr("width", 1000)
+      .attr("height", 500);
+
+  var viz = t.selectAll("rect")
+    .data(de)
+    .enter()
+    .append("rect")
+      .attr("width", 50)
+      .attr("height", function(d, i) { return heightScale(d.count); })
+      .attr("x", function(d, i) { return (i * 55) + 100; })
+      .attr("y", function(d) { return 400 - heightScale(d.count); })
+      .attr("fill", "steelblue")
+    .on('mouseover', function(d, i) {
+      d3.select(this).style('fill', 'gray');
+        statusText
+          .text(d.count)
+            .attr('fill', 'white')
+            .attr("text-anchor", "start")
+            .attr("x", (i * 55) + 128)
+            .attr("y", 404)
+            .attr("transform", 'rotate(-90, ' + (125 + (i * 55)) + ',400)');
+       })
+    .on('mouseout', function(d,i) {
+      statusText
+        .text('');
+    d3.select(this).style('fill', "steelblue");
+    });
+    var statusText = t.append("text");
+
+  var text = t.selectAll(".xLabel")
+    .data(de)
+    .enter()
+    .append("text")
+      .attr("x", function(d, i) { return 125 + (i * 55); })
+      .attr("y", 420)
+      .attr("text-anchor", "middle")
+      //.style("fill", "steelblue")
+      .text(function(d, i) { return d.name; });
+
+  var ticks = t.selectAll(".yTicks")
+    .data(heightScale.ticks(10))
+    .enter()
+    .append("line")
+      .attr('x1', 90)
+      .attr('y1', function(d) { return 400 - heightScale(d); })
+      .attr('x2', 720)
+      .attr('y2', function(d) { return 400 - heightScale(d); })
+    .style('stroke', 'white');
+
+  var text2 = t.selectAll(".yLabel")
+    .data(heightScale.ticks(10))
+    .enter()
+    .append("text")
+      .attr("x", 80)
+      .attr("y", function(d) { return 405 - heightScale(d); })
+      .attr("text-anchor", "end")
+    .text(function(d) { return d; });
+
+
+
+
+  </script>
+  </body>
+</html>

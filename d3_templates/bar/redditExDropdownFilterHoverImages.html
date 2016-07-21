@@ -1,0 +1,196 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="../../roark/d3/d3.v2.min.js"></script>
+    <style>
+      svg {
+        width: 700px;
+        height: 450px;
+      }
+
+      .selected {
+        stroke: red;
+        stroke-width: 3;
+      }
+
+      .domain {
+        fill: none;
+        stroke: #000000;
+      }
+
+      .tick {
+        stroke: #000000;
+      }
+    </style>
+
+    </head>
+
+<body>
+  <!-- user inputs -->
+  <div id="controls">
+    <select id="selector">
+      <option value="pics">pics</option>
+      <option value="programming">programming</option>
+      <option value="gifs">gifs</option>
+      <option value="d3js">d3js</option>
+    </select>
+  </div>
+
+  <!-- visualization -->
+  <svg id="chart" class="chart1">
+    <g id="yaxis"></g>
+  </svg>
+
+  
+  <div id="info">
+  </div>
+
+  <script>
+    //easily get json data for any reddit url
+    function getData(endpoint, callback) {
+      //reddits api is nice so we can use JSONP
+      var url = "http://www.reddit.com/r/" + endpoint + ".json?jsonp=?";
+      $.getJSON(url, function(results) {
+        callback(results);
+      })
+    }
+
+    var cx = 100;
+    var cy = 100;
+    var chartHeight = 300;
+    var barWidth = 20;
+
+
+    function makeChart(disdata) {
+      console.log("make chart", disdata);
+      var datdata = disdata.data.children;
+
+      var min = 0;//d3.min(datdata, function(d) { return d.data.score });
+      var max = d3.max(datdata, function(d) { return d.data.score });
+      //console.log("min, max", min, max);
+
+      var yscale = d3.scale.linear()
+        .domain([min, max])
+        .range([0, chartHeight]);
+
+      var svg = d3.select(".chart1");
+
+      var bars = svg.selectAll("g.bar")
+        .data(datdata);
+
+      var barEnter = bars.enter()
+        .append("g")
+        .classed("bar", true)
+        .attr("transform", function(d,i) {
+          var x = cx + i * 30;
+          var y = cy + chartHeight;
+          return "translate(" + [x,y] + ")";
+        });
+
+      barEnter.append("rect")
+        .attr("fill", "#00ff00")
+        .attr("height", 0);
+      barEnter.append("text");
+
+      var rects = bars.select("rect");
+      var texts = bars.select("text");
+
+
+      texts.text(function(d) { return d.data.score; })
+        .attr({
+          "text-anchor": "middle",
+          "alignment-baseline": "middle",
+          x: barWidth/2,
+          y: -10
+        })
+        .style("visibility", "hidden");
+
+      bars.exit()
+        .transition()
+        .duration(1500)
+        .attr("height", 0)
+        .attr("transform", function(d,i) {
+          var x = cx + i * 30;
+          var y = cy + chartHeight;
+          return "translate(" + [x,y] + ")";
+        })
+        .attr("fill", "#ff0000")
+        .remove()
+
+      bars.select("rect")
+        .attr("width", barWidth)
+
+      bars.transition()
+        .duration(1500)
+        .attr("transform", function(d,i) {
+          var x = cx + i * 30;
+          var y = cy + chartHeight - yscale(d.data.score);
+          return "translate(" + [x,y] + ")";
+        })
+      
+      rects.transition()
+        .duration(1500)
+        .attr("height", function(d) {
+          return yscale(d.data.score);
+        })
+        .attr("fill", "#0000ff")
+
+
+      bars.on("click", function(d) {
+        makeInfo(d);
+      })
+      .on("mouseover", function(d) {
+        d3.select(this).classed("selected", true);
+        d3.select(this).select("text")
+          .style("visibility", "visible")
+      })
+      .on("mouseout", function(d) {
+        d3.select(this).classed("selected", false);
+        d3.select(this).select("text")
+          .style("visibility", "hidden")
+      })
+
+      var yscaleAxis = d3.scale.linear()
+        .domain(yscale.domain())
+        .range([chartHeight, 0]);
+
+      var yAxis = d3.svg.axis()
+        .scale(yscaleAxis)
+        .orient("left")
+
+      var yaxisg = d3.select("#yaxis")
+        .attr("transform", "translate(" + [cx - 10, cy] + ")");
+      yAxis(yaxisg);
+
+
+
+    }
+
+    function makeInfo(data) {
+      //console.log("make info:", data);
+      var info = d3.select("#info").html("");
+
+      info.append("span").text(data.data.title);
+      info.append("img").attr("src", data.data.thumbnail)
+    }
+
+    //example usage
+    getData("pics", makeChart)
+
+    var selector = d3.select("#selector")
+      .on("change", function() {
+        var index = selector.node().selectedIndex;
+        var value = selector.node()[index].value;
+        
+        getData(value, makeChart);
+      })
+
+
+  </script>
+
+</body>
+</html>
+

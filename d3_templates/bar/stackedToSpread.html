@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="../../roark/d3/d3.v2.js"></script>
+        <script type="text/javascript" src="../../roark/underscore/underscore.js"></script>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+
+var a = [52, 27, 11, 15];
+var b = [23, 12, 7, 9];
+var c = [17, 4, 4, 3];
+var d = [12, 2, 5, 8];
+
+//reqs
+var labels = ["A", 
+              "B", 
+              "C",
+              "D"
+             ]
+
+var stacker = function(a) {
+  //transform a list of numbers into a stackable list of objects
+  var st = [];
+  a.forEach(function(s,i) {
+    st.push({x:i, y:s})
+  });
+  return st;
+}
+var data = [stacker(a), 
+            stacker(b),
+            stacker(c),
+            stacker(d)
+           ];
+
+
+var svg = d3.select("body").append("svg")
+.attr({
+  width:1500,
+  height:1500
+})
+
+var group = svg.append("g")
+  .classed("chart1", true)
+  .attr("transform", "translate(" + [100, 20] + ")");
+var tb = stacked_rowbar()
+  .data(data)
+    .labels(labels)
+tb(group);
+
+var stackbtn = svg.append("g")
+    .attr("transform", "translate(" + [600, 100] + ")")
+    .attr("pointer-events", "all")
+stackbtn.append("rect")
+  .attr("width", 100)
+  .attr("height", 30)
+  .style("fill", "none")
+  .style("stroke", "#000000")
+stackbtn.append("text")
+   .text("stack")
+   .attr("x", 28)
+   .attr("y", 22)
+   .style("font-size", 20)
+   .attr("pointer-events", "none")
+stackbtn.on("click", function() {
+  tb.stack();
+})
+var spreadbtn = svg.append("g")
+    .attr("transform", "translate(" + [600, 140] + ")")
+    .attr("pointer-events", "all")
+spreadbtn.append("rect")
+  .attr("width", 100)
+  .attr("height", 30)
+  .style("fill", "none")
+  .style("stroke", "#000000")
+spreadbtn.append("text")
+   .text("spread")
+   .attr("x", 28)
+   .attr("y", 22)
+   .style("font-size", 20)
+   .attr("pointer-events", "none")
+spreadbtn.on("click", function() {
+  tb.spread();
+})
+
+function stacked_rowbar() {
+    //stacked barchart 
+    var width = 400;
+    var height = 600;
+    var color_scale = d3.scale.category20();
+    var stroke = "#000000";
+  var stroke_opacity = 0.2;
+  var stroke_width = 1;
+  var fill_opacity = 0.69;
+  
+    var margin = [0, 0, 0, 0];
+    
+  var data;
+    var labels;
+    var diffs = [];
+    var chart;
+  var g;
+  
+    var xscale;
+    var yscale;
+
+    chart = function(group) {
+      g = group;
+      //var w = width - margin[1] - margin[3];
+        
+      var stack = d3.layout.stack()
+      var stacked = stack(data);
+      //console.log(stacked)
+      
+      var smax = d3.max(stacked, function(d) {
+        return d3.max(d, function(d) {
+          return d.y0 + d.y;
+        });
+      })
+
+      xscale = d3.scale.linear()
+        .domain([0, smax])
+        .range([0, width]);
+      
+      yscale = d3.scale.ordinal()
+        .domain(d3.range(stacked[0].length))
+        .rangeBands([0, height], 0.3);
+
+      //optional bounding box of chart
+      g.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "none")
+        .attr("stroke", stroke)
+        .style("stroke-opacity", stroke_opacity)
+      
+
+        //create the DOM elements!
+        var layers = g.selectAll("g.layer")
+            .data(stacked)
+        layers
+            .enter()
+            .append("g")
+            .classed("layer", true);
+        
+        var bars = layers.selectAll("rect.bar")
+            .data(function(d) { return d; })
+        
+        bars.enter()
+          .append("rect")
+          .classed("bar", true)
+          
+        
+      
+        if(labels) {
+        
+          var lbls = g.selectAll("text.labels")
+            .data(labels);
+          lbls.enter()
+            .append("text")
+            .classed("labels", true);
+
+          var lbls = g.selectAll("text.labels")
+          lbls.text(function(d) {
+            return d;
+          })
+          .attr("transform", function(d,i) {
+            var x = -10;
+            var y = yscale(i) + yscale.rangeBand()/2;
+            return "translate(" + [x,y] + ")" + "rotate(" + 0 + ")";
+          })
+          .style("text-anchor", "end")
+            .style("alignment-baseline", "central");
+        }
+      
+      //chart.stack();
+      chart.spread();
+
+    };
+  
+    
+    chart.spread = function() {
+      //need max of y for each element in the stack
+      //slicing "down" so we can spread things out
+      var spread = [];
+      var m = 0 ;
+      data.forEach(function(d,i) {
+        m = d3.max(d, function(f,j) {
+          return f.y0;
+        })
+        spread.push(m)
+      })
+      var layers = g.selectAll("g.layer");
+      layers.style("fill", function(d,i) {
+          return color_scale(i);
+      })
+       .transition()
+        .duration(500)
+      .attr("transform", function(d,i) {
+        //console.log(i, spread[i], xscale(spread[i]))
+        var x = xscale(spread[i]);
+        return "translate(" + [x, 0] + ")";
+      })
+      
+        
+      var bars = layers.selectAll("rect.bar")
+      bars.attr("height", function(d, i) {
+            return yscale.rangeBand();
+        })
+        .attr("width", function(d,i) {
+            return xscale(d.y);
+        })
+        .style("fill-opacity", fill_opacity)
+        .style("stroke", stroke)
+        .style("stroke-opacity", stroke_opacity)
+        .style("stroke-width", stroke_width)
+        
+        .transition()
+        .duration(500)
+        .attr("transform", function(d,i) {
+          var x = 0;
+          //var x = xscale(d.y0)
+          var y = yscale(i);
+          return "translate(" + [x,y] + ")";
+        })
+        
+        ;
+        
+    };
+    chart.stack = function() {
+      
+      var layers = g.selectAll("g.layer");
+      layers.style("fill", function(d,i) {
+          return color_scale(i);
+      })
+        .transition()
+        .duration(500)
+      .attr("transform", function(d,i) {
+        //console.log(i, spread[i], xscale(spread[i]))
+        return "translate(" + [0, 0] + ")";
+      })
+     
+        
+      var bars = layers.selectAll("rect.bar")
+      bars
+        .attr("height", function(d, i) {
+            return yscale.rangeBand();
+        })
+        .attr("width", function(d,i) {
+            return xscale(d.y);
+        })
+        /*
+        .attr("transform", function(d,i) {
+          var x = 0;
+          var y = yscale(i);
+          return "translate(" + [x,y] + ")";
+        })*/
+        .transition()
+        .duration(500)
+        
+        .attr("transform", function(d,i) {
+          var x = xscale(d.y0);
+          var y = yscale(i);
+          return "translate(" + [x,y] + ")";
+        })
+        .style("fill-opacity", fill_opacity)
+        .style("stroke", stroke)
+        .style("stroke-opacity", stroke_opacity)
+        .style("stroke-width", stroke_width)
+        ;
+      
+    };
+  
+    chart.data = function(value){
+        if (!arguments.length) { return data; }
+        data = value;
+        return chart;
+    };
+  
+    chart.labels = function(value){
+        if (!arguments.length) { return labels; }
+        labels = value;
+        return chart;
+    };
+
+    chart.width = function(value) {
+        if (!arguments.length) { return width; }
+        width = value;
+        return chart;
+    };
+
+    chart.height = function(value) {
+        if (!arguments.length) { return height; }
+        height = value;
+        return chart;
+    };
+
+    chart.color_scale = function(value) {
+        if (!arguments.length) { return color_scale; }
+        color_scale = value;
+        return chart;
+    };
+
+    return chart;
+};
+
+        </script>
+    </body>
+</html> 

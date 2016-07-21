@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="../../roark/d3/d3.v2.js"></script>
+        <script type="text/javascript" src="../../roark/underscore/underscore.js"></script>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+        //body always equals #display in tributary or name of div when in .js file
+var buttonMale = d3.select("body").append("button")
+    .classed("pone", true)
+    .text("male");
+var buttonFemale = d3.select("body").append("button")
+    .text("female");
+    
+var svg = d3.select("body").append("svg")
+  
+var cx = 50;
+var cy = 10;
+var ch = 300;
+var cw = 553;
+
+var dataone = [
+        {'count': 728, 'name': 'sample0'}, 
+        {'count': 824, 'name': 'sample1'}, 
+        {'count': 963, 'name': 'sample2'}, 
+        {'count': 927, 'name': 'sample3'}, 
+        {'count': 721, 'name': 'sample4'}, 
+        {'count': 874, 'name': 'sample5'}, 
+        {'count': 733, 'name': 'sample6'}, 
+        {'count': 757, 'name': 'sample7'}
+  ]
+    
+var datatwo = [
+        {'count': 728, 'name': 'sample0'}, 
+        {'count': 824, 'name': 'sample1'}, 
+        {'count': 963, 'name': 'sample2'}, 
+        {'count': 927, 'name': 'sample3'}, 
+        {'count': 721, 'name': 'sample4'}, 
+        {'count': 874, 'name': 'sample5'}, 
+        {'count': 733, 'name': 'sample6'}, 
+        {'count': 757, 'name': 'sample7'}
+  ]
+    
+var heightScale = d3.scale.linear()
+    .domain([0, d3.max(dataone, function(d) { return d.count; }) ])
+    .range([0, 200]);
+
+var chart = svg.append("g")
+    .attr("transform", "translate(" + [cx,cy] + ")");
+
+chart.append("rect")
+  .attr({
+    id: "bg",
+    height: ch,
+    width: cw,
+    fill: "lightgrey",
+  })
+  
+chart.append("g")
+  .attr("id", "points")
+
+var myBars = chart.select("#points").selectAll("rect")
+    .data(dataone)
+myBars.enter()
+  .append("rect")
+  .classed("bars", true)
+      .attr({
+      width: 20,
+      height: function(d, i) {
+        return heightScale(d.count)
+      },
+      x: function(d, i) {
+        return (i * 22) + 114; 
+      },
+      y: function(d, i) {
+        return 260 - heightScale(d.count)
+      },
+    })
+  
+buttonMale
+  .on("click", function() {
+    myBars
+      .attr("fill", "red")
+  })
+  
+buttonFemale
+  .on("click", function() {
+    myBars
+      .attr("fill", "steelblue")
+  })
+  
+chart.append("text")
+  .text("clicks")
+  .attr("x", 408)
+  .attr("y", 231)
+
+        </script>
+    </body>
+</html> 

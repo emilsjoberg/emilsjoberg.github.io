@@ -1,0 +1,163 @@
+
+<html>
+  <head>
+  <script type="text/javascript" src="../../roark/d3/d3.v2.js"></script>
+  <style>
+    .fig {
+      font-family:Arial;
+      font-size:10pt;
+      color:darkgray;
+    }
+  </style>
+  </head>
+  <body>
+    <div id="buttons"></div>
+    <script type="text/javascript">
+    
+   var buttonMale = d3.select("#buttons").append("button")
+    .classed("buttonone", true)
+    .text("male");
+var buttonFemale = d3.select("#buttons").append("button")
+    .text("female");
+
+var buttonTotal = d3.select("#buttons").append("button")
+    .text("total");
+    
+var svg = d3.select("body").append("svg")
+  .attr("width", 700)
+  .attr("height", 700);
+  
+var cx = 50;
+var cy = 10;
+var ch = 300;
+var cw = 553;
+
+var dataone = [
+      {'count': 10, 'name': 'sample0'}, 
+      {'count': 15, 'name': 'sample1'}, 
+      {'count': 12, 'name': 'sample2'}, 
+      {'count': 11, 'name': 'sample3'}, 
+      {'count': 8, 'name': 'sample4'}, 
+      {'count': 19, 'name': 'sample5'}
+  ]
+    
+var datatwo = [
+      {'count': 5, 'name': 'sample0'}, 
+      {'count': 7, 'name': 'sample1'}, 
+      {'count': 15, 'name': 'sample2'}, 
+      {'count': 4, 'name': 'sample3'}, 
+      //{'count': 933, 'name': 'sample6'}, 
+      //{'count': 257, 'name': 'sample7'}
+  ]
+    
+var datatotal = [
+      {'count': 15, 'name': 'sample0'}, 
+      {'count': 22, 'name': 'sample1'}, 
+      {'count': 27, 'name': 'sample2'}, 
+      {'count': 15, 'name': 'sample3'}, 
+      {'count': 8, 'name': 'sample4'}, 
+      {'count': 19, 'name': 'sample5'}
+  ]
+    
+var heightScale = d3.scale.linear()
+    .domain([0, d3.max(dataone, function(d) { return d.count; }) ])
+    .range([0, 200]);
+
+var chart = svg.append("g")
+    .attr("transform", "translate(" + [cx,cy] + ")");
+
+chart.append("rect")
+  .attr({
+    id: "bg",
+    height: ch,
+    width: cw,
+    fill: "lightgrey",
+  })
+  
+chart.append("g")
+  .attr("id", "points")
+
+function makeBars(data) {  //creating a new function
+  //this gives all the bars the same height/scale
+  //heightScale
+      //.domain([0, d3.max(data, function(d) {return d.count; }) ])
+    
+var funBars = chart.select("#points").selectAll("rect")
+        
+    .data(data, function(d) { return d.name });
+  
+    funBars.enter()
+        .append("rect")
+        .classed("bars", true)
+        .attr({
+          width: 20, 
+          //height:0,
+          x: function(d, i) { 
+            return (i * 22) + 114; },
+          y: 300,
+        });
+  
+    funBars.exit()
+      .transition()
+      .duration(1000)
+      .attr({
+        height: 0,
+        y: 300,
+      })
+    .remove();
+    
+    funBars
+      .transition()
+      .duration(1000)
+      .attr({
+        width: 20,
+        height: function(d, i) {
+          return heightScale(d.count) },
+        x: function(d, i) {
+          return (i * 22) + 114; },
+        y: function(d, i) {
+          return ch - heightScale(d.count) },
+        }),    
+      
+     funBars.on("mouseover", function(d, i) {
+      chart.select("#clicks")
+        .text("clicks: " + d.count)
+        //.style("fill", "lightgrey")
+        .attr({
+          x: 383,
+          y: 200,
+        })
+       funBars.on("mouseout", function(d,i) {
+         chart.select("#clicks")
+          .text("")})
+  
+     })
+} //end of the function
+
+makeBars(dataone);
+  
+buttonMale
+  .on("click", function() {
+  makeBars(dataone);
+    })
+  
+buttonFemale
+  .on("click", function() {
+    makeBars(datatwo);   
+  })
+  
+buttonTotal
+  .on("click", function() {
+    makeBars(datatotal);
+  })
+  
+chart.append("text")
+  .attr("id", "clicks")
+  //.text("clicks")
+ // .attr("x", 408)
+ // .attr("y", 231)
+
+
+   </script>
+  </body>
+</html>

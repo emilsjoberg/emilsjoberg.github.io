@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="../../roark/d3/d3.v2.js"></script>
+        <script type="text/javascript" src="../../roark/underscore/underscore.js"></script>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+var svg = d3.select("body").append("svg")
+.attr({
+  width:500,
+  height:500
+})
+
+var datatwo = [
+  {home: 2, away: 4, field: "H"},
+  {home: 1, away: 2, field: "A"},
+  {home: 3, away: 0, field: "H"},
+  {home: 5, away: 3, field: "A"},
+  {home: 4, away: 1, field: "A"},
+  {home: 2, away: 4, field: "H"},
+  {home: 3, away: 2, field: "H"},
+  {home: 4, away: 0, field: "H"},
+  {home: 1, away: 2, field: "A"},
+  {home: 6, away: 1, field: "H"},
+  {home: 0, away: 3, field: "A"},
+  {home: 1, away: 4, field: "A"},
+  {home: 2, away: 1, field: "H"},
+  {home: 2, away: 1, field: "H"}
+  ];
+
+var homeMax = d3.max(datatwo, function(d) { return d.home; });
+var awayMax = d3.max(datatwo, function(d) { return d.away; });
+
+var scale = d3.scale.linear()
+  .domain([0, Math.max(homeMax, awayMax) ])
+  .range([0, 85]);
+
+var chart = svg.append("g");
+
+chart.append("g")
+  .attr("id", "points");
+
+var home_bars = chart.select("#points").selectAll("rect.homebars")
+  .data(datatwo)
+home_bars.enter()
+  .append("rect")
+  .classed("homebars", true)
+.attr({
+  rx: 10,
+  width:18,
+  height: function(d,i) {
+    return scale(d.home)
+  },
+  x: function(d,i) {
+    return (i*20) + 100
+  },
+  y: function(d,i) {
+    return 171 - scale(d.home)
+  }
+})
+.style("opacity", function(d) {
+  if ((d.field==="A") || (d.home < d.away))
+    return ".5"
+});
+
+
+var away_bars = chart.select("#points").selectAll("rect.lostbars")
+  .data(datatwo)
+away_bars.enter()
+  .append("rect")
+  .classed("lostbars", true)
+.attr({
+  rx: 10,
+  width:18,
+  height: function(d,i) {
+    return scale(d.away)
+  },
+  x: function(d,i) {
+    return (i*20) + 100
+  },
+  y: function(d,i) {
+    return 176;
+  }
+})
+.style("opacity", function(d) {
+  if ((d.field==="H") || (d.away < d.home))
+    return ".5"
+});
+
+
+        </script>
+    </body>
+</html> 

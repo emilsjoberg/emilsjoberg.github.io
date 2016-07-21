@@ -1,0 +1,632 @@
+
+<html>
+  <head>
+  <script type="text/javascript" src="../../../roark/d3/d3.v2.js"></script>
+  <style>
+
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+  stroke-width:1px;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+
+  </style>
+  </head>
+  <body>
+    <div id="display"></div>
+    <script type="text/javascript">
+    
+var buttonOne = d3.select("#display").append("button")
+  .text("one");
+
+var buttonTwo = d3.select("#display").append("button")
+  .text("stacked");
+
+var buttonThree = d3.select("#display").append("button")
+  .text("percent")
+
+var svg = d3.select("#display").append("svg")
+
+var dataone = [ 
+     {'count': 4, 'name': 'sample0'}, 
+     {'count': 8, 'name': 'sample1'}, 
+     {'count': 15, 'name': 'sample2'}, 
+     {'count': 16, 'name': 'sample3'}, 
+     {'count': 23, 'name': 'sample4'}, 
+     {'count': 42, 'name': 'sample5'}];
+
+var datatwo = [
+     {'count': 10, 'name': 'sample0'}, 
+     {'count': 18, 'name': 'sample1'}, 
+     {'count': 12, 'name': 'sample2'}, 
+     {'count': 26, 'name': 'sample3'}, 
+     {'count': 13, 'name': 'sample4'}, 
+     {'count': 12, 'name': 'sample5'}];
+
+var datathree = [
+     {'count': 14, 'name': 'sample0'}, 
+     {'count': 26, 'name': 'sample1'}, 
+     {'count': 27, 'name': 'sample2'}, 
+     {'count': 42, 'name': 'sample3'}, 
+     {'count': 36, 'name': 'sample4'}, 
+     {'count': 54, 'name': 'sample5'}];
+
+var positive = [
+  {'name':'app', 'count':'104'},
+  {'name':'laptop', 'count':'94'},
+  {'name':'looks', 'count':'65'},
+  {'name':'apps', 'count':'55'},
+  {'name':'phone', 'count':'47'},
+  {'name':'Surface', 'count':'47'},
+  {'name':'OS', 'count':'46'},
+  {'name':'upgrade', 'count':'44'},
+  {'name':'tablet', 'count':'39'},
+  {'name':'PC', 'count':'38'},
+  {'name':'touch', 'count':'29'},
+  {'name':'desktop', 'count':'29'},
+  {'name':'start', 'count':'23'}];
+
+var negative = [
+  {'name':'app', 'count':'66'},
+  {'name':'laptop', 'count':'136'},
+  {'name':'looks', 'count':'50'},
+  {'name':'apps', 'count':'54'},
+  {'name':'phone', 'count':'36'},
+  {'name':'Surface', 'count':'28'},
+  {'name':'OS', 'count':'45'},
+  {'name':'upgrade', 'count':'36'},
+  {'name':'tablet', 'count':'35'},
+  {'name':'PC', 'count':'156'},
+  {'name':'touch', 'count':'48'},
+  {'name':'desktop', 'count':'37'},
+  {'name':'start', 'count':'69'}];
+
+var aggregate = [
+  {'name':'app', 'count':'170'},
+  {'name':'laptop', 'count':'230'},
+  {'name':'looks', 'count':'115'},
+  {'name':'apps', 'count':'109'},
+  {'name':'phone', 'count':'83'},
+  {'name':'Surface', 'count':'75'},
+  {'name':'OS', 'count':'91'},
+  {'name':'upgrade', 'count':'80'},
+  {'name':'tablet', 'count':'74'},
+  {'name':'PC', 'count':'194'},
+  {'name':'touch', 'count':'77'},
+  {'name':'desktop', 'count':'66'},
+  {'name':'start', 'count':'92'}];
+
+var positivepercent = [
+  {'name':'app', 'count':'61'},
+  {'name':'laptop', 'count':'41'},
+  {'name':'looks', 'count':'57'},
+  {'name':'apps', 'count':'50'},
+  {'name':'phone', 'count':'57'},
+  {'name':'Surface', 'count':'63'},
+  {'name':'OS', 'count':'51'},
+  {'name':'upgrade', 'count':'55'},
+  {'name':'tablet', 'count':'53'},
+  {'name':'PC', 'count':'20'},
+  {'name':'touch', 'count':'38'},
+  {'name':'desktop', 'count':'44'},
+  {'name':'start', 'count':'25'}];
+
+var negativepercent = [
+  {'name':'app', 'count':'39'},
+  {'name':'laptop', 'count':'59'},
+  {'name':'looks', 'count':'43'},
+  {'name':'apps', 'count':'50'},
+  {'name':'phone', 'count':'43'},
+  {'name':'Surface', 'count':'37'},
+  {'name':'OS', 'count':'49'},
+  {'name':'upgrade', 'count':'45'},
+  {'name':'tablet', 'count':'47'},
+  {'name':'PC', 'count':'80'},
+  {'name':'touch', 'count':'62'},
+  {'name':'desktop', 'count':'56'},
+  {'name':'start', 'count':'75'}];
+
+var hundred = [
+  {'name':'app', 'count':'100'},
+  {'name':'laptop', 'count':'100'},
+  {'name':'looks', 'count':'100'},
+  {'name':'apps', 'count':'100'},
+  {'name':'phone', 'count':'100'},
+  {'name':'Surface', 'count':'100'},
+  {'name':'OS', 'count':'100'},
+  {'name':'upgrade', 'count':'100'},
+  {'name':'tablet', 'count':'100'},
+  {'name':'PC', 'count':'100'},
+  {'name':'touch', 'count':'100'},
+  {'name':'desktop', 'count':'100'},
+  {'name':'start', 'count':'100'}];
+ 
+var cx = 20;
+var cy = 10;
+var cw = 575;
+var ch = 500;
+
+var leftchartpadding = 140;
+var chartbaseline = 225;
+var centerbaseline = 350;
+
+var heightScale = d3.scale.linear()
+  .domain([0, d3.max(aggregate, function(d) {return d.count; })])
+  .range([0, 100]);
+
+var percentHeightScale = d3.scale.linear()
+  .domain([0, 100])
+  .range([0, 200]); 
+
+
+var yAxisScale = d3.scale.linear()
+  //.domain([0, d3.max(negative, function(d) {return d.count; }) ])
+.domain([0, 156])
+  .range([0,170]);
+ 
+var yAxis = d3.svg.axis()
+  .scale(yAxisScale)
+  .orient("left");
+  //.ticks(7)
+  //.tickValues(25,50,75,100);
+  
+
+var yInverseAxisScale = d3.scale.linear()
+  //.domain([0, d3.max(positive, function(d) {return d.count; }) ])
+  .domain([0, 104])
+    .range([114,0]);
+
+var yInverseAxis = d3.svg.axis()
+  .scale(yInverseAxisScale)
+  .orient("left")
+  .ticks(5); 
+
+var stackedAxisScale = d3.scale.linear()
+  //.domain([0, d3.max(aggregate, function(d) {return d.count; })])
+  .domain([0, 230])
+  .range([250, 0]);
+
+var stackedAxis = d3.svg.axis()
+  .scale(stackedAxisScale)
+  .orient("left");
+
+var percentScale = d3.scale.linear()
+  //.domain([0, d3.max(aggregate, function(d) {return d.count; })])
+  .domain([0, 100])
+  .range([200, 0]);
+
+var percentAxis = d3.svg.axis()
+  .scale(percentScale)
+  .orient("left");
+  
+
+var chart = svg.append("g")
+  .attr("transform", "translate(" + [cx,cy] + ")");
+
+chart.append("rect")
+.attr({
+  id: "bg",
+  width: cw,
+  height: ch,
+  fill: "lightgrey"
+})
+
+
+chart.append("g")
+  .attr("id", "points")
+
+var inversebars = chart.select("#points").selectAll("rect.bars")
+    .data(negative)
+
+inversebars.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    width: 20,
+    height: function(d, i) {
+        return heightScale(d.count)
+      },
+    x: function(d, i) {
+        return (i * 22) + leftchartpadding; 
+      },
+    y:chartbaseline + 3, 
+    fill: "darkred",
+    })  
+
+inversebars.on('mouseover', function(d,i) {
+  d3.select(this).style('fill', 'grey');
+ barLabelText
+ .text("Topic: " + d.name)
+  .attr({
+    x: 95,
+    y: 440,
+  })  
+})
+
+
+inversebars.on('mouseout', function(d,i) {
+  d3.select(this).style('fill', 'darkred');
+ barLabelText
+ .text('');
+})
+
+
+chart.append("g")
+.attr("id", "static")
+
+var staticbars = chart.select("#static").selectAll("rect.emma")
+  .data(positive)
+
+staticbars.enter()
+  .append("rect")
+  .classed("emma", true)
+.attr({
+    width: 20,
+    height: function(d,i) {
+      return heightScale(d.count) },
+    x: function(d,i) {
+      return (i*22) + leftchartpadding; },
+    y: function(d,i) {
+      return chartbaseline - heightScale(d.count) },
+    fill: "green", 
+}) 
+
+staticbars.on('mouseover', function(d,i) {
+  d3.select(this).style('fill', 'grey');
+ barLabelText
+ .text("Topic: " + d.name)
+  .attr({
+    x: 95,
+    y: 440,
+  })  
+})
+
+staticbars.on('mouseout', function(d,i) {
+  d3.select(this).style('fill', 'green');
+barLabelText
+ .text('');
+})
+
+
+//AXIS
+var inverseaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,113] + ")")
+.call(yInverseAxis)
+
+var yaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,231] + ")")
+.call(yAxis)
+
+
+buttonTwo
+.on("click", function() {
+  
+var inversebars = chart.select("#points").selectAll("rect.bars")
+    .data(aggregate)
+
+inversebars.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    width: 20,
+//    height: function(d, i) {
+ //       return heightScale(d.count)
+ //     },
+    x: function(d, i) {
+        return (i * 22) + leftchartpadding; 
+      },
+    y:chartbaseline + 3, 
+    //fill: "darkred",
+    })  
+
+inversebars.exit()
+.transition()
+.duration()
+.remove()
+
+inversebars
+.transition()
+.duration(1000)
+.attr({
+    width: 20,
+    height: function(d,i) {
+      return heightScale(d.count) },
+    x: function(d,i) {
+      return (i*22) + leftchartpadding; },
+    y: function(d,i) {
+      return centerbaseline - heightScale(d.count) },
+    //fill: "steelblue", 
+  fill:"darkred"
+}) 
+
+var staticbars = chart.select("#static").selectAll("rect.emma")
+.data(positive)
+
+     
+     staticbars.enter()
+     .append("rect")
+     .classed("emma", true)
+     .attr({
+       width: 20,
+       x: function(d,i) {
+         return (i*22) + leftchartpadding;
+       },
+       y: function(d,i) {
+         return chartbaseline - heightScale(d.count)
+       },
+     })
+     
+     staticbars.exit()
+     .transition()
+     .duration()
+     .remove()
+      
+      staticbars
+      .transition()
+      .duration(1000)
+      .attr({
+        width: 20,
+        height: function(d,i) {
+          return heightScale(d.count)
+        },
+        x: function(d,i) {
+          return (i*22) + leftchartpadding; 
+        },
+        y: function(d,i) {
+          return centerbaseline - heightScale(d.count)
+        },
+      })
+
+
+  
+  //yInverseAxis 
+//  .remove(); 
+ 
+     
+    
+   chart.selectAll(".axis")  
+   // .transition()
+     //.duration(1000) 
+     //.call(yAxis)
+   .remove();   
+    
+
+  
+  var stackaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,100] + ")")
+  .transition()
+  .duration(1000)
+.call(stackedAxis) 
+
+   
+  
+})//second button  
+
+
+buttonOne
+.on("click", function() {
+  
+  var inversebars = chart.select("#points").selectAll("rect.bars")
+    .data(negative)
+  
+  inversebars.enter()
+  .append("rect")
+  .classed("bars", true)
+  .attr({
+    width: 20,
+    x: function(d,i) {
+      return (i*22) + leftchartpadding;
+    },
+    y:chartbaseline + 3,
+  })
+  
+  inversebars.exit()
+  .transition()
+  .duration()
+  .remove()
+  
+  inversebars
+  .transition()
+  .duration(1000) 
+    .attr({
+    width: 20,
+    height: function(d, i) {
+        return heightScale(d.count)
+      },
+    x: function(d, i) {
+        return (i * 22) + leftchartpadding; 
+      },
+    y: chartbaseline + 3, 
+    fill: "darkred",
+    })  
+  
+  
+  
+var staticbars = chart.select("#static").selectAll("rect.emma")
+.data(positive)
+  
+     staticbars.enter()
+     .append("rect")
+     .classed("emma", true)
+     .attr({
+       width: 20,
+       x: function(d,i) {
+         return (i*22) + leftchartpadding;
+       },
+       y: function(d,i) {
+         return chartbaseline - heightScale(d.count)
+       },
+     })
+     
+     staticbars.exit()
+     .transition()
+     .duration()
+     .remove()
+      
+      staticbars
+      .transition()
+      .duration(1000)
+      .attr({
+        width: 20,
+        height: function(d,i) {
+          return heightScale(d.count)
+        },
+        x: function(d,i) {
+          return (i*22) + leftchartpadding; 
+        },
+        y: function(d,i) {
+          return chartbaseline - heightScale(d.count)
+        },
+      })
+    
+  
+      
+      
+           //one axis again
+     chart.selectAll(".axis")  
+   // .transition()
+     //.duration(1000) 
+     //.call(yAxis)
+   .remove(); 
+      
+      var inverseaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,113] + ")")
+          .transition()
+     .duration(1000) 
+.call(yInverseAxis)
+
+var yaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,231] + ")")
+    .transition()
+     .duration(1000) 
+.call(yAxis)
+
+      
+  
+})//first button
+
+
+
+buttonThree //percent
+.on("click", function() {
+    var inversebars = chart.select("#points").selectAll("rect.bars")
+        .data(hundred)
+      
+      inversebars.enter()
+      .append("rect")
+      .classed("bars", true)
+      .attr({
+        width: 20,
+        x: function(d,i) {
+          return (i * 22) + leftchartpadding;
+        },
+        y: chartbaseline + 3,
+      })
+      
+      inversebars.exit()
+      .transition()
+      .duration()
+      .remove() 
+      
+      inversebars
+      .transition()
+      .duration(1000)
+      .attr({
+        width:20,
+        height: function(d,i) {
+          return percentHeightScale(d.count)
+        },
+        x: function(d,i) {
+          return (i * 22) + leftchartpadding;
+        },
+        y: function(d,i) {
+          return centerbaseline - percentHeightScale(d.count)
+        },
+        //fill:  "blue"
+        fill: "darkred"
+      })
+      
+      
+      
+     var staticbars = chart.select("#static").selectAll("rect.emma")
+        .data(positivepercent)
+     
+     staticbars.enter()
+     .append("rect")
+     .classed("emma", true)
+     .attr({
+       width: 20,
+       x: function(d,i) {
+         return (i*22) + leftchartpadding;
+       },
+       y: function(d,i) {
+         return centerbaseline - percentHeightScale(d.count)
+       },
+     })
+     
+     staticbars.exit()
+     .transition()
+     .duration()
+     .remove()
+      
+      staticbars
+      .transition()
+      .duration(1000)
+      .attr({
+        width: 20,
+        height: function(d,i) {
+          return percentHeightScale(d.count)
+        },
+        x: function(d,i) {
+          return (i*22) + leftchartpadding; 
+        },
+        y: function(d,i) {
+          return centerbaseline - percentHeightScale(d.count)
+        },
+      })
+      
+      
+      
+     //percent axis 
+     chart.selectAll(".axis")  
+   // .transition()
+     //.duration(1000) 
+     //.call(yAxis)
+   .remove();   
+    
+
+  
+  var percentaxis = chart.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + [120,150] + ")")
+  .transition()
+  .duration(1000)
+.call(percentAxis) 
+      
+  
+}) //percent button
+
+
+var barLabelText = chart.append("text");
+
+
+
+
+
+   </script>
+  </body>
+</html>
