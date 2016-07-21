@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.link {
+    fill: none;
+    stroke: #bbb;
+}
+
+.node:hover {
+    stroke: orangered;
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+        return "<strong>Name:</strong> <span style='color:red'>" + d.id + "</span>" + "<br>" + "<strong>Group:</strong> <span style='color:red'>" + d.group ;
+    });
+
+var fill_color = d3.scale.ordinal()
+    .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    //.range(["#85144b","#14898a", "black", "#ddd", "#144b85", "purple", "pink"]);
+    .range(["#001f3f", "#0074D9", "#7FDBFF", "#FF4136", "#85144b", "#3D9970", "#FFDC00", "#FF851B", "#B10DC9"]);
+
+var width = 1200,
+    height = 1250;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.call(tip);
+
+var color = d3.scale.category20();
+
+d3.json("../mastercard.json", function(error, graph) {
+    console.log(graph)
+
+//Initialize a default force layout, using the nodes and edges in dataset
+    var force = d3.layout.force()
+        .nodes(graph.nodes)
+        .links(graph.links)
+        .size([width, height])
+        //.linkDistance([50])
+        .charge([-100])
+        .start();
+
+
+    var link = svg.selectAll('.link')
+        .data(graph.links)
+        .enter().append('line')
+        .attr('class', 'link');
+
+    var node = svg.selectAll('.node')
+        .data(graph.nodes)
+        .enter().append('circle')
+        //.attr("fill", function(d) { return color(d.group); })
+        .attr('fill', function(d) {return fill_color(d.group); })
+        .attr('stroke-width', 4)
+        //.attr('stroke', function(d) {return d3.rgb(fill_color(d.category)).darker(); });
+        .attr("stroke", "white")
+        .attr('class', 'node')
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+        .call(force.drag);
+
+    force.on('tick', function() {
+
+            node//.attr('r', 5)
+                .attr('r', function(d) { 
+                    if (d.group==0 || d.group==1 || d.group==2 || d.group==3 || d.group==4) {
+                        return 10
+                    } else {
+                        return 5
+                    }
+                })
+                .attr('cx', function(d) { return d.x; })
+                .attr('cy', function(d) { return d.y; });
+
+            link.attr('x1', function(d) { return d.source.x; })
+                .attr('y1', function(d) { return d.source.y; })
+                .attr('x2', function(d) { return d.target.x; })
+                .attr('y2', function(d) { return d.target.y; });
+
+    });
+
+    force.start();
+
+}); 
+</script>
