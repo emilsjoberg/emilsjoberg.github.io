@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Force-Directed Layout (Multiple Foci)</title>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.geom.js"></script>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var data = [
+    {
+        "grant_title": "Revenue",
+        "id": 1,
+        "organization": "pone",
+        "total_amount": 20,
+        "group": "low",
+        "Grant start date": "pone",
+        "start_month": 1,
+        "start_day": 1,
+        "start_year": 2012
+    },
+    {
+        "grant_title": "emma watson",
+        "id": 1,
+        "organization": "pone",
+        "total_amount": 20,
+        "group": "low",
+        "Grant start date": "pone",
+        "start_month": 1,
+        "start_day": 1,
+        "start_year": 2012
+    },
+    {
+        "grant_title": "Profit",
+        "id": 2,
+        "organization": "pone",
+        "total_amount": 20,
+        "group": "medium",
+        "Grant start date": "pone",
+        "start_month": 1,
+        "start_day": 1,
+        "start_year": 2012
+    }
+];
+
+var w = 960,
+    h = 500,
+    fill = d3.scale.category10(),
+    nodes = [],
+    foci = [{x: 150, y: 150}, {x: 400, y: 150}, {x: 650, y: 150}];
+
+var max_amount = d3.max(data, function(d) { return parseInt(d.total_amount, 10); } );
+var radius_scale = d3.scale.pow().exponent(0.5).domain([0, max_amount]).range([2, 85]);
+
+data.forEach(function(d) {
+var node = {
+    id: d.id,
+    radius: radius_scale(parseInt(d.total_amount, 10)),
+    value: d.total_amount,
+    name: d.grant_title,
+    org: d.organization,
+    group: d.group,
+    year: d.start_year,
+    x: Math.random() * 900,
+    y: Math.random() * 800
+};
+nodes.push(node);
+});
+
+nodes.sort(function(a,b) { return b.value - a.value; });
+
+var vis = d3.select("body").append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+var force = d3.layout.force()
+    .nodes(nodes)
+    .links([])
+    .gravity(0)
+    .size([w, h]);
+
+
+force.on("tick", function(e) {
+
+  // Push nodes toward their designated focus.
+  var k = .1 * e.alpha;
+  nodes.forEach(function(o, i) {
+    o.x += (foci[o.id].x - o.x) * k;
+    o.y += (foci[o.id].y - o.y) * k;
+  });
+
+  vis.selectAll("circle.node")
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+});
+
+
+
+  vis.selectAll("circle.node")
+      .data(nodes)
+    .enter().append("svg:circle")
+      .attr("class", "node")
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .attr("r", 8)
+      .style("fill", function(d) { return fill(d.id); })
+      .style("stroke", function(d) { return d3.rgb(fill(d.id)).darker(2); })
+      .style("stroke-width", 1.5)
+      .call(force.drag);
+
+
+
+
+    </script>
+  </body>
+</html>
