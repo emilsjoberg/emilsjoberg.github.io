@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+  		<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon"/>
+	    <meta charset="utf-8">
+	    <title>Template &middot; Bootstrap</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <meta name="description" content="">
+	    <meta name="author" content="">
+
+	    <!-- Le styles -->
+	    <link href="../roark/bootstrap/css/bootstrap.css" rel="stylesheet">
+	    <link href="../roark/fontawesome/css/font-awesome.css" rel="stylesheet">
+	    <link href="../style.css" rel="stylesheet">
+      <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700,900,500' rel='stylesheet' type='text/css'>
+	    <style type="text/css"></style>
+
+	    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+	    <!--[if lt IE 9]>
+	      <script src="../assets/js/html5shiv.js"></script>
+	    <![endif]-->
+
+    	<!-- Google Analytics -->
+	    <script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		 	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-40859148-1', 'danielfeusse.com');
+		 	ga('send', 'pageview');
+	    </script>
+
+  	</head>
+  	<body>
+
+    <div class="container">
+
+      	<div class="masthead">
+        	<h1 class="name">Daniel Feusse</h1>
+      	</div>
+
+      	<ul class="nav nav-pills">
+  			<li class="lead"><a href="../index.html">About</a></li>
+  			<li class="lead"><a href="../blog.html">Blog</a></li>
+  			<li class="lead"><a href="../projects.html">Projects</a></li>
+  			<li class="lead"><a href="../templates.html">D3</a></li>
+		</ul>
+      
+        <p class="lead mainmessage"> What is big about big data? </p>
+        <p class="lead date">July 2013</p>
+
+    </div> <!-- end of container 1 -->
+
+    <div class="blogPostBody">
+        <div class="container">
+        	<p>
+The term’ big data’ has become ubiquitous. Most people have been inundated with the term when consuming their morning news to the point of annoyance. Working in analytics, I viewed the topic being vital for a handful of companies such as Google, Amazon and Facebook; but not to the masses as so many claimed it could, and will be. A particular tweet I remember recently reading verbally lashing those who so freely discuss the topic read, “saying "Big Data" is like saying marijuana cigarettes, it signals to the people that do it that you don't know what you are talking about.” Big Data’ course offered through Coursera 
+<br><br>
+I have been watching most of the lectures for the ‘Web Intelligence and Big Data’ course offered through Coursera. While parsing through this content, I had some thoughts of why ‘big data’ is important, even if data is not ‘big’. I think most refer to the principles that have emerged with the topic. Working at R/GA, our data is not ‘big’. We do not need to incorporate parallel computing into our data analysis. As social media compounds, we may at some point, but realistically not in 2013. I thought this meant that the subject was then rendered irrelevant. This thought process is wrong though. This was the most valuable lesson I have taken away from the Coursera course.
+<br><br>
+Let me explain this last statement, and why ‘big data’ is very important for R/GA and most companies performing analytics. My opinion is that using databases is good practice. It helps with the data hygiene process; it is like a sanity check for making sure data is clean and well structured. It is also very easy to derive insights from querying the data. Databases were designed though to keep track of financial transactions; analytics came as an afterthought. But big data was designed for analytics. Databases allow querying. By querying though, you are only seeing a very small percentage of your data by using commands such as LIMIT, ORDER BY, etc. Big data techniques allow and enourage counting, not querying. Now all data points are being touched, which is necessary for analytical techniques like computing classifiers (Bayesian). Map-reduce, a main concept behind big data, is designed for counting, not querying. Big data is about wide data.
+<br><br>
+An example of wide data pertains to any e-commerce site. At first, using SQL, queries are written to extract insights. Queries can be written to look into certain regions, or sales by a city for a product during a certain time period. But this is manually filtering the data. Let’s say more data is being accumulated for each customer, such as words they are writing in emails, clicks on the web site, etc. The data starts growing exponentially. Sampling this data using SQL becomes an unfulfillable request. Those performing business intelligence need to learn deeper analytical techniques; they need to count, not sample, the data. This is a brief example of how big data is about wide data, a wide scope of data about customers or users, not just petabytes of data instead of gigabytes. The bottom line is you need to touch all your data. That is what is actually big about big data.
+        	</p>
+      	</div>
+    </div>
+
+
+    <div class="container">
+        <div class="backtoblog">
+          	<a href="../blog.html">Back to blog posts</a>
+        </div>
+
+        <ul id="social">
+            <li>
+              	<a href="mailto:dfeusse@gmail.com?subject=hi" id="sidebar-email" class="icon-envelope-alt" title="Say hi"></a>
+            </li>
+
+            <li>
+              	<a href="http://www.linkedin.com/in/dfeusse" id="sidebar-linkedin" class="icon-linkedin-sign" title="My LinkedIn page"></a>
+            </li>
+
+            <li>
+              <a href="http://github.com/dfeusse" id="sidebar-github" class="icon-github" title="I share and fork code here"></a>
+            </li>
+          </ul>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
