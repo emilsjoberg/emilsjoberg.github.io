@@ -1,0 +1,26 @@
+[
+	{
+		"original address": "London, UK",
+		"returned address": "London, UK",
+		"latitude": "51.5112139",
+		"longitude": "-0.1198244"
+	},
+	{
+		"original address": "Brooklyn, New York",
+		"returned address": "Brooklyn, NY, USA",
+		"latitude": "40.65",
+		"longitude": "-73.95"
+	},
+	{
+		"original address": "321 West 37th Street, Manhattan, New York, USA",
+		"returned address": "321 West 37th Street, New York, NY 10018, USA",
+		"latitude": "40.7545443",
+		"longitude": "-73.9930957"
+	},
+	{
+		"original address": "San Francisco, USA",
+		"returned address": "San Francisco, CA, USA",
+		"latitude": "37.7749295",
+		"longitude": "-122.4194155"
+	}
+]

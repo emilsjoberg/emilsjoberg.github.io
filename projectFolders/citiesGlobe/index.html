@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.geo-globe {
+				fill: lightgrey; 
+				/* fill: rgb(8,29,88); */
+			}
+			.geo-path {
+				fill: #132A50; 
+				stroke: #FFFFFF;
+				stroke-width: 0.2;
+			}
+	.geo-node {
+		stroke-width: 0.0;
+		stroke: rgba(255, 0, 10, 0.66); 
+		fill: rgba(255, 0, 10, 0.66); 
+			    
+		cursor: pointer;                
+	}
+
+	.geo-node:hover {
+		stroke: #a00;
+		fill: #a00;
+	}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<h1></h1>
+<script>
+
+	//d3.select(window)
+    //	.on("mousemove", mousemove)
+    //	.on("mouseup", mouseup);
+
+	var width = 960,
+		height = 500;
+
+	var centroid = d3.geo.path()
+    	.projection(function(d) { return d; })
+    	.centroid;
+
+	var projection = d3.geo.orthographic()
+		//.translate([width / 2, height / 2])
+		.scale(248)
+		.clipAngle(90);
+
+	var path = d3.geo.path()
+		.projection(projection);
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+	var backgroundCircle = svg.append("svg:circle")
+        .attr('cx', width / 2)
+        .attr('cy', height / 2)
+        .attr('r', projection.scale())
+        .attr('class', 'geo-globe');
+
+	var title = svg.append("text")
+    	//.attr("x", width / 2)
+    	//.attr("y", height * 3 / 5);
+    	.attr("x", width / 14)
+    	.attr("y", height / 10);
+
+    var rotate = d3_geo_greatArcInterpolator();
+
+	var world = svg.append('g');
+
+	// Create the element group to mark individual locations:
+    var locations = svg.append('g')
+	    .attr('id', 'locations');
+
+	//render globe
+	d3.json('world-countries.json', function(collection) { 
+
+		world = world.selectAll('.geo-path')
+			.data(collection.features)
+			.enter()
+			.insert('path')
+			.attr('class', 'geo-path')
+			.attr('d', path);
+	
+
+	//location data
+	d3.json('data.geojson', function(collection) {
+
+		console.log(collection.features)
+		var cities = collection.features;
+		var n = cities.length;
+		var i = -1;
+
+		circles = locations.selectAll('.geo-node')
+			.data(cities)
+			.enter()
+			.insert('path')
+			.attr('class', 'geo-node')
+			.attr('d', path);
+
+		//console.log(cities)
+		/*
+		//transition attempt
+		(function transition() {
+	    d3.transition()
+	        .duration(1250)
+	        //change h1 title
+	        .each("start", function() {
+	          	title.text(cities[i = (i + 1) % n].name);
+	        })
+	        .tween("rotate", function() {
+	          	var p = d3.geo.centroid(cities[i]),
+	              	r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
+		        return function(t) {
+		            projection.rotate(r(t));
+		        };
+	        })
+	      	.transition()
+	      	.each("end", transition);
+	 	})();
+	 	*/
+	 	step();
+
+	 	function step() {
+	 		if (++i >= n) i = 0;
+
+	 		title.text(cities[i].properties.name);
+
+	 		circles.transition()//.duration(1250)
+	 			.style("fill", function(d, j) { return j === i ? "red" : "transparent"; })
+	 			
+	 		path
+	 			.pointRadius(function(d, j) { return j === i ? 15 : 5; });
+
+	 		d3.transition()
+	 			.delay(250)
+	 			.duration(1250)
+	 			.tween("rotate", function() {
+	 				var point = centroid(cities[i]);
+	 				rotate.source(projection.rotate()).target([-point[0], -point[1]]).distance();
+	 				return function(t) {
+	 					projection.rotate(rotate(t));
+	 					circles.attr("d", path);
+	 					world.attr("d", path);
+	 				};
+	 			}) //end of tween function
+	 			.transition()
+	 			.each("end", step);
+
+
+	 	} //end of function step
+
+	}); //end of cities json function
+
+});
+
+
+
+var d3_radians = Math.PI / 180;
+
+function d3_geo_greatArcInterpolator() {
+  var x0, y0, cy0, sy0, kx0, ky0,
+      x1, y1, cy1, sy1, kx1, ky1,
+      d,
+      k;
+
+  function interpolate(t) {
+    var B = Math.sin(t *= d) * k,
+        A = Math.sin(d - t) * k,
+        x = A * kx0 + B * kx1,
+        y = A * ky0 + B * ky1,
+        z = A * sy0 + B * sy1;
+    return [
+      Math.atan2(y, x) / d3_radians,
+      Math.atan2(z, Math.sqrt(x * x + y * y)) / d3_radians
+    ];
+  }
+
+  interpolate.distance = function() {
+    if (d == null) k = 1 / Math.sin(d = Math.acos(Math.max(-1, Math.min(1, sy0 * sy1 + cy0 * cy1 * Math.cos(x1 - x0)))));
+    return d;
+  };
+
+  interpolate.source = function(_) {
+    var cx0 = Math.cos(x0 = _[0] * d3_radians),
+        sx0 = Math.sin(x0);
+    cy0 = Math.cos(y0 = _[1] * d3_radians);
+    sy0 = Math.sin(y0);
+    kx0 = cy0 * cx0;
+    ky0 = cy0 * sx0;
+    d = null;
+    return interpolate;
+  };
+
+  interpolate.target = function(_) {
+    var cx1 = Math.cos(x1 = _[0] * d3_radians),
+        sx1 = Math.sin(x1);
+    cy1 = Math.cos(y1 = _[1] * d3_radians);
+    sy1 = Math.sin(y1);
+    kx1 = cy1 * cx1;
+    ky1 = cy1 * sx1;
+    d = null;
+    return interpolate;
+  };
+
+  return interpolate;
+}	
+
+
+</script>

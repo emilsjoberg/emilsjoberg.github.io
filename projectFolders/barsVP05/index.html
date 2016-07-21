@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title></title>
+    <style>
+        body, html{ 
+            margin: 20 20 20 20;
+            width: 80%;
+            height: 80%;
+        }
+        bar-chart{
+            width: 100%;
+            /* height: 100%; */
+            display: block;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        bar-chart .bar{
+            fill: steelblue;
+            stroke: white;
+        }
+    </style>
+    </head>
+    <body ng-app="myApp" ng-controller="MainCtrl">
+        <bar-chart data="chart" ng-style="{ height: 100 / charts.length + '%' }" ng-repeat="chart in charts"></bar-chart>
+    </body>
+
+    <script src="../../roark/d3/d3.v2.js"></script>
+    <script src="../../roark/angular/angular.min.js"></script>
+    <script src="bar-chart.controller.js"></script>
+    <script src="bar-chart.directive.js"></script>
+    <script src="bar-chart.visual.js"></script>
+  </body>
+</html>
