@@ -55,7 +55,7 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-        return "<strong>Name:</strong> <span style='color:red'>" + d.id + "</span>" + "<br>" + "<strong>Group:</strong> <span style='color:red'>" + d.group ;
+        return "<strong>Name:</strong> <span style='color:red'>" + d.name + "</span>" + "<br>" + "<strong>Group:</strong> <span style='color:red'>" + d.group ;
     });
 
 var fill_color = d3.scale.ordinal()
@@ -74,7 +74,7 @@ svg.call(tip);
 
 var color = d3.scale.category20();
 
-d3.json("../mastercard.json", function(error, graph) {
+d3.json("../mastercard_new.json", function(error, graph) {
     console.log(graph)
 
 //Initialize a default force layout, using the nodes and edges in dataset
